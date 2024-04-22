@@ -25,9 +25,9 @@ public:
     DbEngine(const std::string &db_path) : db_path_(db_path) {}
 
 
-    virtual bool Open() {  };
+    virtual bool Open() { return true; };
 
-    virtual bool Close() {};
+    virtual bool Close() {return true;};
 
     /**
      *  get value from db engine
@@ -38,7 +38,7 @@ public:
     virtual bool Get(uint32_t key, uint32_t *value) { return true; };
 
     // adjacency list format
-    virtual bool Get(uint32_t key, std::vector<uint32_t> *value) {  };
+    virtual bool Get(uint32_t key, std::vector<uint32_t> &value) {  };
 
     virtual bool Get(uint32_t key, std::set<uint32_t> *value) { return true; };
 

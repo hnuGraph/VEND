@@ -42,26 +42,37 @@ public:
             graph_->RemoveEdge(pair.first, pair.second, timer.get());
         }
         std::ofstream output(output_path_, std::ios::out|std::ios::app);
-        std::cout << VEND_STRING[vend_type_] << " delete time cost :" << timer->CountTime() / 1000000 << "\n";
-        output << VEND_STRING[vend_type_] << ',' << "delete" << ',' << batch << "," << timer->CountTime() / 1000000
+        std::cout << VEND_STRING[vend_type_] << " delete time cost :" << timer->CountTime() / 1000000000 << "\n";
+        output << VEND_STRING[vend_type_] << ',' << "delete" << ',' << batch << "," << timer->CountTime() / 1000000000
                << "\n";
         //graph_->DestoryDb();
     };
 
     void CreateList(uint32_t vertex_size, std::vector<std::pair<uint32_t, uint32_t>> *vertex_list) override {
         srand(time(NULL));
-        std::vector<uint32_t> neighbors;
+//        std::vector<uint32_t> neighbors;
+//        while (vertex_list->size() < vertex_size) {
+//            std::vector<uint32_t>().swap(neighbors);
+//            uint32_t vertex1 = rand() % VERTEX_SIZE + 1;
+//            graph_->GetNeighbors(vertex1, neighbors);
+//            if (neighbors.size() == 0)
+//                continue;
+//            uint32_t vertex2 = neighbors[rand() % neighbors.size()];
+//            vertex_list->push_back(std::pair<uint32_t, uint32_t>(vertex1, vertex2));
+//        }
+        std::uniform_int_distribution<unsigned> u(1, VERTEX_SIZE);
+        std::default_random_engine e;
+        e.seed(time(NULL));
+        uint32_t vertex1,vertex2;
         while (vertex_list->size() < vertex_size) {
-            std::vector<uint32_t>().swap(neighbors);
-            uint32_t vertex1 = rand() % VERTEX_SIZE + 1;
-            graph_->GetNeighbors(vertex1, &neighbors);
-            if (neighbors.size() == 0)
+            vertex1 = u(e);
+            vertex2 = u(e);
+            if(vertex1==vertex2)
                 continue;
-            uint32_t vertex2 = neighbors[rand() % neighbors.size()];
-            vertex_list->push_back(std::pair<uint32_t, uint32_t>(vertex1, vertex2));
-
-
+            vertex_list->push_back({vertex1,vertex2});
         }
+
+
     };
 };
 

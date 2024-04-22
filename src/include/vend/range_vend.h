@@ -18,6 +18,8 @@ class RangeVend : public Vend {
 
 
 public:
+    RangeVend()=default;
+
     RangeVend(std::shared_ptr<std::vector<std::vector<uint32_t >>> &adj_list, const std::string &encode_path,
               std::shared_ptr<DbEngine> &db) : Vend(
             adj_list, encode_path, db) {
@@ -25,7 +27,7 @@ public:
     }
 
     RangeVend(const std::string &encode_path, std::shared_ptr<DbEngine> &db) : Vend(encode_path, db) {
-        adjacency_list_= nullptr;
+        adjacency_list_ = nullptr;
         Init(db);
     }
 

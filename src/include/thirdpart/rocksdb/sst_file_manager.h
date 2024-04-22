@@ -21,7 +21,8 @@ class Logger;
 
 // SstFileManager is used to track SST and blob files in the DB and control
 // their deletion rate. All SstFileManager public functions are thread-safe.
-// SstFileManager is not extensible.
+// SstFileManager is NOT an extensible interface but a public interface for
+// result of NewSstFileManager. Any derived classes must be RocksDB internal.
 class SstFileManager {
  public:
   virtual ~SstFileManager() {}
@@ -92,7 +93,8 @@ class SstFileManager {
 //
 // @param env: Pointer to Env object, please see "rocksdb/env.h".
 // @param fs: Pointer to FileSystem object (rocksdb/file_system.h"
-// @param info_log: If not nullptr, info_log will be used to log errors.
+// @param info_log: If not nullptr, info_log will be used to log messages of
+// INFO, WARN or ERROR level with respect to info_log's info level.
 //
 // == Deletion rate limiting specific arguments ==
 // @param trash_dir: Deprecated, this argument have no effect

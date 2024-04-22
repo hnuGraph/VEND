@@ -13,7 +13,7 @@ public:
     void Execute(){
         std::shared_ptr<DbEngine> db = std::make_shared<DbEngine>();
         VendFactory::GetEncode(vend_type_,encode_path_,db,vend_);
-        std::cout<<VEND_STRING[vend_type_]<<" memory cost: "<<memory::getMemory()<<std::endl;
+        std::cout<<VEND_STRING[vend_type_]<<" memory cost: "<<memory::getMemory()<<" KB"<<std::endl;
     }
 
 private:

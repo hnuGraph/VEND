@@ -11,6 +11,7 @@
 #ifndef VEND_FULL_SCORE_EXECUTION_H1
 #define VEND_FULL_SCORE_EXECUTION_H1
 
+#include "execution/score_execution.h"
 static constexpr uint32_t SCORE_BATCH = 1000000;
 static constexpr uint64_t TOTAL_PAIRS_SIZE = 100000000;
 

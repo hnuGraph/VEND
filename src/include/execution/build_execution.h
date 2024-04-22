@@ -1,10 +1,10 @@
 //===----------------------------------------------------------------------===//
 //
-//                         
 //
-// 
 //
-// 
+//
+//
+//
 //
 //===----------------------------------------------------------------------===//
 
@@ -18,14 +18,18 @@
  *
  * */
 class BuildExecution : public Execution {
-public:
+   public:
     BuildExecution(std::string data_path, std::string db_path, std::string vend_prefix, VendType vend_type)
-            : data_path_(data_path), Execution(db_path, vend_prefix, vend_type) {
+        : data_path_(data_path), Execution(db_path, vend_prefix, vend_type) {
         if (!IS_LARGE)
-            graph_ = std::make_shared<Graph>(data_path,db_path, vend_path_, vend_type);
+            graph_ = std::make_shared<Graph>(data_path, db_path, vend_path_, vend_type);
         else
-            graph_ = std::make_shared<LargeGraph>(data_path,db_path, vend_path_, vend_type);    }
-
+            graph_ = std::make_shared<LargeGraph>(data_path, db_path, vend_path_, vend_type);
+    }
+    BuildExecution(std::string data_path, std::string db_path, std::string vend_prefix, VendType vend_type,bool directed)
+        : data_path_(data_path), Execution(db_path, vend_prefix, vend_type) {
+            graph_ = std::make_shared<Graph>(data_path, db_path, vend_path_, vend_type,directed);
+    }
     void Execute() override {
         graph_->Init();
         if (vend_type_ == VendType::NoVend) {
@@ -33,11 +37,9 @@ public:
         }
     }
 
-
-private:
+   private:
     // csv txt file
     std::string data_path_;
 };
 
-
-#endif //VEND_BUILD_EXECUTION_H
+#endif  // VEND_BUILD_EXECUTION_H

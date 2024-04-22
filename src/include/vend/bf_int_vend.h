@@ -34,7 +34,7 @@ public:
         //assert(adjacency_list_->size() == VERTEX_SIZE + 1);
         assert(encodes_ != nullptr);
         if (adjacency_list_) {
-            //std::cout << "build encode from adj \n";
+            std::cout << "build encode from adj \n";
             for (uint32_t vertex1 = 1; vertex1 < adjacency_list_->size(); ++vertex1) {
                 for (auto &vertex2: adjacency_list_->at(vertex1)) {
                     if (vertex1 < vertex2)

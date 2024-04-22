@@ -21,13 +21,22 @@ RocksDb::RocksDb(const std::string &db_path) : DbEngine(db_path) {
     // open_options_.OptimizeLevelStyleCompaction();
     // create the DB if it's not already present
     open_options_.create_if_missing = true;
+    DisableCache();
     read_options_ = ROCKSDB_NAMESPACE::ReadOptions();
     read_options_.fill_cache = false;
-
     write_options_ = ROCKSDB_NAMESPACE::WriteOptions();
 
     assert(Open());
 }
+
+void RocksDb::DisableCache() {
+    BlockBasedTableOptions table_options;
+    table_options.no_block_cache = true;
+    open_options_.table_factory.reset(NewBlockBasedTableFactory(table_options));
+//    open_options_.write_buffer_size = 1024;
+//    open_options_.max_write_buffer_number = 1;
+}
+
 
 bool RocksDb::Close() {
     if (rocksdb_ != nullptr) {
@@ -55,7 +64,7 @@ bool RocksDb::Get(uint32_t key, uint32_t *value) {
     return true;
 }
 
-bool RocksDb::Get(uint32_t key, std::vector<uint32_t> *value) {
+bool RocksDb::Get(uint32_t key, std::vector<uint32_t> &value) {
     std::string data;
     Status s = rocksdb_->Get(read_options_, std::to_string(key), &data);
     if (s.IsNotFound())
@@ -73,9 +82,9 @@ bool RocksDb::Get(uint32_t key, std::set<uint32_t> *value) {
     return true;
 }
 
-void RocksDb::StringToValue(const std::string &data, std::vector<uint32_t> *value) {
+void RocksDb::StringToValue(const std::string &data, std::vector<uint32_t> &value) {
     size_t len = data.length();
-    value->assign((uint32_t *) data.c_str(), (uint32_t *) data.c_str() + len / 4);
+    value.assign((uint32_t *) data.c_str(), (uint32_t *) data.c_str() + len / 4);
 }
 
 void RocksDb::StringToValue(const std::string &data, std::set<uint32_t> *value) {
@@ -100,7 +109,7 @@ bool RocksDb::Put(uint32_t key, const std::vector<uint32_t> &value) {
         return true;
     size_t len;
     char *data;
-    ValueToString(value, &len,&data);
+    ValueToString(value, &len, &data);
     Status s = rocksdb_->Put(write_options_, std::to_string(key), Slice(data, len));
     free(data);
     return s.ok();
@@ -134,13 +143,13 @@ void RocksDb::BatchWrite(const std::vector<uint32_t> &keys, const std::vector<st
     assert(keys.size() == values.size());
     WriteBatch write_batch;
     size_t len;
-    char **data = new char* [keys.size()];
+    char **data = new char *[keys.size()];
     for (size_t i = 0; i < keys.size(); ++i) {
-        ValueToString(values[i], &len,&data[i]);
+        ValueToString(values[i], &len, &data[i]);
         write_batch.Put(std::to_string(keys[i]), Slice(data[i], len));
     }
     rocksdb_->Write(write_options_, &write_batch);
-    for(int i=0;i<keys.size();++i)
+    for (int i = 0; i < keys.size(); ++i)
         delete[] data[i];
     delete[] data;
     rocksdb_->Close();
@@ -156,14 +165,11 @@ bool RocksDb::Next(uint32_t *key, std::vector<uint32_t> *value) {
     if (!iterator_->Valid())
         return false;
     StringToValue(iterator_->key().ToString(), key);
-    StringToValue(iterator_->value().ToString(), value);
+    StringToValue(iterator_->value().ToString(), *value);
     iterator_->Next();
     return true;
 
 }
-
-
-
 
 
 

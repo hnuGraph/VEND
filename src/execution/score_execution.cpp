@@ -1,24 +1,20 @@
 //===----------------------------------------------------------------------===//
 //
-//                         
 //
-// 
 //
-// 
+//
+//
+//
 //
 //===----------------------------------------------------------------------===//
-
-
 
 #include "execution/score_execution.h"
 
 #include <random>
 
-
-void
-ScoreExecution::RandomCreate(uint32_t vertex_size1, std::unordered_set<uint32_t> *vertex_list1, uint32_t vertex_size2,
-                             std::unordered_set<uint32_t> *vertex_list2) {
-    std::uniform_int_distribution<unsigned> u(1, VERTEX_SIZE + 1);
+void ScoreExecution::RandomCreate(uint32_t vertex_size1, std::unordered_set<uint32_t> *vertex_list1,
+                                  uint32_t vertex_size2, std::unordered_set<uint32_t> *vertex_list2) {
+    std::uniform_int_distribution<unsigned> u(1, VERTEX_SIZE);
     std::default_random_engine e;
     e.seed(time(NULL));
     while (vertex_list1->size() < vertex_size1) {
@@ -27,11 +23,9 @@ ScoreExecution::RandomCreate(uint32_t vertex_size1, std::unordered_set<uint32_t>
     e.seed(time(NULL));
     while (vertex_list2->size() < vertex_size2) {
         uint32_t id = u(e) % VERTEX_SIZE + 1;
-        if (vertex_list1->find(id) == vertex_list1->end())
-            vertex_list2->insert(id);
+        if (vertex_list1->find(id) == vertex_list1->end()) vertex_list2->insert(id);
     }
 }
-
 
 void ScoreExecution::Execute() {
     Init();
@@ -41,35 +35,32 @@ void ScoreExecution::Execute() {
     memset(percent, 0, sizeof(double) * PLAN_NUMS);
 
     std::ofstream output(output_path_, std::ios::app | std::ios::out);
-    for (auto &pair:pair_list_) {
+    for (auto &pair : pair_list_) {
         for (int i = 0; i < PLAN_NUMS; ++i) {
-            if (graphs_[i]->GetEdge(pair.first, pair.second)!=PairType::Uncertain)
-                ++scores[i];
+            if (graphs_[i]->GetEdge(pair.first, pair.second) != PairType::Uncertain) ++scores[i];
         }
-
     }
     for (int i = 0; i < PLAN_NUMS; ++i) {
-        percent[i] = (double) scores[i] / list_size_ * 100;
-        std::cout << "  Plan " << i << " : " << VEND_STRING[Vends[i]] << "  score : " << scores[i] << "("
-                  << percent[i] << "%)" << "\n";
+        percent[i] = (double)scores[i] / list_size_ * 100;
+        std::cout << "  Plan " << i << " : " << VEND_STRING[Vends[i]] << "  score : " << scores[i] << "(" << percent[i]
+                  << "%)"
+                  << "\n";
         output << scores[i] << ',' << percent[i] << ',';
     }
     output << "\n";
     output.close();
 }
 
-
 void ScoreExecution::CreateList(uint32_t vertex_size, std::vector<std::pair<uint32_t, uint32_t>> *vertex_list) {
     std::vector<uint32_t> random_array;
-    for (int i = 1; i <= VERTEX_SIZE; ++i)
-        random_array.push_back(i);
+    for (int i = 1; i <= VERTEX_SIZE; ++i) random_array.push_back(i);
 
     std::shuffle(random_array.begin(), random_array.end(), std::mt19937(std::random_device()()));
     uint32_t vertex1, vertex2;
     for (auto v:random_array) {
 
         std::vector<uint32_t> neighbors;
-        graphs_[0]->GetNeighbors(v, &neighbors);
+        graphs_[0]->GetNeighbors(v, neighbors);
         int neighbor_nums = neighbors.size();
         if (neighbor_nums <= 1)
             continue;
@@ -85,5 +76,24 @@ void ScoreExecution::CreateList(uint32_t vertex_size, std::vector<std::pair<uint
             }
         }
     }
-}
+    std::uniform_int_distribution<unsigned> u;
+    std::default_random_engine e(time(NULL));
 
+    // while (vertex_list->size() < vertex_size) {
+    //     for (auto vertex : random_array) {
+    //         std::vector<uint32_t> neighbors;
+    //         graphs_[0]->GetNeighbors(vertex, neighbors);
+    //         int neighbor_size = neighbors.size();
+    //         if (neighbor_size <= 1) continue;
+
+    //         int random1 = u(e) % neighbor_size;
+    //         int random2 = u(e) % neighbor_size;
+    //         while (random1 == random2) {
+    //             random1 = u(e) % neighbor_size;
+    //             random2 = u(e) % neighbor_size;
+    //         }
+    //         vertex_list->push_back({neighbors[random1], neighbors[random2]});
+    //         if (vertex_list->size() >= vertex_size) return;
+    //     }
+    // }
+}

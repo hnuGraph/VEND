@@ -55,7 +55,7 @@ namespace memory{
         char line[128];
 
         while (fgets(line, 128, file) != NULL){
-            if (strncmp(line, "VmRSS:", 7) == 0){
+            if (strncmp(line, "VmRSS:", 6) == 0){
                 result = parseLine(line);
                 break;
             }
@@ -66,3 +66,4 @@ namespace memory{
 }
 
 #endif //VEND_UTILS_H
+

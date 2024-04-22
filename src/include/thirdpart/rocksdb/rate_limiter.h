@@ -15,14 +15,16 @@
 
 namespace ROCKSDB_NAMESPACE {
 
+// Exceptions MUST NOT propagate out of overridden functions into RocksDB,
+// because RocksDB is not exception-safe. This could cause undefined behavior
+// including data loss, unreported corruption, deadlocks, and more.
 class RateLimiter {
  public:
   enum class OpType {
-    // Limitation: we currently only invoke Request() with OpType::kRead for
-    // compactions when DBOptions::new_table_reader_for_compaction_inputs is set
     kRead,
     kWrite,
   };
+
   enum class Mode {
     kReadsOnly,
     kWritesOnly,
@@ -38,6 +40,15 @@ class RateLimiter {
   // REQUIRED: bytes_per_second > 0
   virtual void SetBytesPerSecond(int64_t bytes_per_second) = 0;
 
+  // This API allows user to dynamically change the max bytes can be granted in
+  // a single refill period (i.e, burst)
+  //
+  // REQUIRED: single_burst_bytes > 0. Otherwise `Status::InvalidArgument` will
+  // be returned.
+  virtual Status SetSingleBurstBytes(int64_t /* single_burst_bytes */) {
+    return Status::NotSupported();
+  }
+
   // Deprecated. New RateLimiter derived classes should override
   // Request(const int64_t, const Env::IOPriority, Statistics*) or
   // Request(const int64_t, const Env::IOPriority, Statistics*, OpType)
@@ -46,13 +57,15 @@ class RateLimiter {
   // Request for token for bytes. If this request can not be satisfied, the call
   // is blocked. Caller is responsible to make sure
   // bytes <= GetSingleBurstBytes()
+  // and bytes >= 0.
   virtual void Request(const int64_t /*bytes*/, const Env::IOPriority /*pri*/) {
     assert(false);
   }
 
   // Request for token for bytes and potentially update statistics. If this
   // request can not be satisfied, the call is blocked. Caller is responsible to
-  // make sure bytes <= GetSingleBurstBytes().
+  // make sure bytes <= GetSingleBurstBytes()
+  // and bytes >= 0.
   virtual void Request(const int64_t bytes, const Env::IOPriority pri,
                        Statistics* /* stats */) {
     // For API compatibility, default implementation calls the older API in
@@ -63,7 +76,8 @@ class RateLimiter {
   // Requests token to read or write bytes and potentially updates statistics.
   //
   // If this request can not be satisfied, the call is blocked. Caller is
-  // responsible to make sure bytes <= GetSingleBurstBytes().
+  // responsible to make sure bytes <= GetSingleBurstBytes()
+  // and bytes >= 0.
   virtual void Request(const int64_t bytes, const Env::IOPriority pri,
                        Statistics* stats, OpType op_type) {
     if (IsRateLimited(op_type)) {

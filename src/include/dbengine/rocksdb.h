@@ -26,10 +26,12 @@ public:
 
     ~RocksDb() {
         Close();
+        std::cout<<"close rocksdb "<<std::endl;
         delete rocksdb_;
         iterator_ = nullptr;
         rocksdb_ = nullptr;
     };
+
 
     bool Open() override;
 
@@ -37,7 +39,7 @@ public:
 
     bool Get(uint32_t key, uint32_t *value) override;
 
-    bool Get(uint32_t key, std::vector<uint32_t> *value) override;
+    bool Get(uint32_t key, std::vector<uint32_t> &value) override;
     bool Get(uint32_t key, std::set<uint32_t> *value) override;
 
     bool Put(uint32_t key, uint32_t value) override;
@@ -59,12 +61,13 @@ public:
 
     char *ValueToString(uint32_t value, size_t *len);
 
-    void StringToValue(const std::string &data, std::vector<uint32_t> *value);
+    void StringToValue(const std::string &data, std::vector<uint32_t> &value);
     void StringToValue(const std::string &data, std::set<uint32_t> *value);
 
     void StringToValue(const std::string &data, uint32_t *value);
 
 private:
+    void DisableCache();
     ROCKSDB_NAMESPACE::DB *rocksdb_;
     ROCKSDB_NAMESPACE::Iterator *iterator_;
     ROCKSDB_NAMESPACE::Options open_options_;

@@ -31,18 +31,20 @@ public:
         //graph_->BackUpDb();
         graph_->Init();
         Init();
+
+
         std::unique_ptr<Timer> timer= std::make_unique<Timer>();
         for (auto &pair:pair_list_) {
             graph_->AddEdge(pair.first, pair.second, timer.get());
         }
         std::ofstream output(output_path_,std::ios::out|std::ios::app);
-        std::cout << VEND_STRING[vend_type_] << " insert time cost :" << timer->CountTime()/1000000 << "\n";
-        output << VEND_STRING[vend_type_] << ',' << "insert" << ',' << list_size_ << "," << timer->CountTime()/1000000 << "\n";
+        std::cout << VEND_STRING[vend_type_] << " insert time cost :" << timer->CountTime()/1000000000 << "\n";
+        output << VEND_STRING[vend_type_] << ',' << "insert" << ',' << list_size_ << "," << timer->CountTime()/1000000000 << "\n";
        // graph_->DestoryDb();
     };
 
     void CreateList(uint32_t vertex_size, std::vector<std::pair<uint32_t, uint32_t>> *vertex_list) override {
-        std::uniform_int_distribution<unsigned> u(1, VERTEX_SIZE + 1);
+        std::uniform_int_distribution<unsigned> u(1, VERTEX_SIZE);
         std::default_random_engine e;
         e.seed(time(NULL));
         while (vertex_list->size() < vertex_size) {
@@ -50,9 +52,10 @@ public:
             uint32_t vertex2 = u(e) % VERTEX_SIZE + 1;
             if (vertex1 == vertex2)
                 continue;
-            if (!graph_->DbQuery(vertex1, vertex2)) {
-                vertex_list->push_back(std::pair<uint32_t, uint32_t>(vertex1, vertex2));
-            }
+            vertex_list->push_back(std::pair<uint32_t, uint32_t>(vertex1, vertex2));
+//            if (!graph_->DbQuery(vertex1, vertex2)) {
+//                vertex_list->push_back(std::pair<uint32_t, uint32_t>(vertex1, vertex2));
+//            }
         }
 
     };
