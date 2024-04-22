@@ -15,9 +15,10 @@
 #include <vector>
 
 #define UP_TO_ONE(x) x<=1?1:x
-const uint32_t BIT_HASH_BEST_NUMS = log(2) * 64 * K_SIZE / DEGREE;
-const uint32_t INT_HASH_BEST_NUMS = UP_TO_ONE(log(2) * 2 * K_SIZE / DEGREE);
-const uint32_t COUNT_HASH_BEST_NUMS=UP_TO_ONE(log(2) * 2 * K_SIZE*(32/ELEMENT_SIZE) / DEGREE);
+extern uint32_t BIT_HASH_BEST_NUMS;
+extern uint32_t INT_HASH_BEST_NUMS;
+extern uint32_t COUNT_HASH_BEST_NUMS;
+extern uint32_t PREFIX_BIT_SIZE;
 static const std::vector<uint32_t> HASH_PARAM1 = {
         9191891, 1635947, 6893911, 2908361, 3877817, 5170427,
         2703929, 9961873, 8702593, 6795587, 3838903, 1609511,
@@ -42,5 +43,5 @@ static const std::vector<uint32_t> HASH_PARAM2 = {
         4214123, 6162077, 6528673, 3763867, 6954799, 3726403,
         4801627, 1597961, 4228381, 9210757, 5584463, 8847067,
 };
-
+void InitHashConfig();
 #endif //VEND_HASH_CONFIG_H

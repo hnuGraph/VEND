@@ -2,7 +2,7 @@
 #ifndef VEND_RANDOM_QUERY_EXECUTION_H
 #define VEND_RANDOM_QUERY_EXECUTION_H
 
-#include "common/config.h"
+
 #include "query_execution.h"
 class RandomQueryExecution:public QueryExecution{
 public:
@@ -13,9 +13,10 @@ public:
     }
 
 
+
     void CreateList(uint32_t vertex_size, std::vector <std::pair<uint32_t, uint32_t>> *vertex_list) override{
 
-        std::uniform_int_distribution<unsigned> u(1, VERTEX_SIZE + 1);
+        std::uniform_int_distribution<unsigned> u(1, VERTEX_SIZE);
         std::default_random_engine e;
         e.seed(time(NULL));
         uint32_t vertex1,vertex2;

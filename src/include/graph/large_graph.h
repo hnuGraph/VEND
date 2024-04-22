@@ -25,6 +25,8 @@ public:
 
     void UpdateEdges(std::unordered_map<uint32_t, std::vector<uint32_t>> *adj);
 
+
+    void InitGraph();
 private:
     int write_batch;
 

@@ -78,9 +78,12 @@ class SstPartitioner {
   };
 };
 
+// Exceptions MUST NOT propagate out of overridden functions into RocksDB,
+// because RocksDB is not exception-safe. This could cause undefined behavior
+// including data loss, unreported corruption, deadlocks, and more.
 class SstPartitionerFactory : public Customizable {
  public:
-  virtual ~SstPartitionerFactory() {}
+  ~SstPartitionerFactory() override {}
   static const char* Type() { return "SstPartitionerFactory"; }
   static Status CreateFromString(
       const ConfigOptions& options, const std::string& value,
@@ -90,7 +93,7 @@ class SstPartitionerFactory : public Customizable {
       const SstPartitioner::Context& context) const = 0;
 
   // Returns a name that identifies this partitioner factory.
-  virtual const char* Name() const = 0;
+  const char* Name() const override = 0;
 };
 
 /*
@@ -121,7 +124,7 @@ class SstPartitionerFixedPrefixFactory : public SstPartitionerFactory {
  public:
   explicit SstPartitionerFixedPrefixFactory(size_t len);
 
-  virtual ~SstPartitionerFixedPrefixFactory() {}
+  ~SstPartitionerFixedPrefixFactory() override {}
 
   static const char* kClassName() { return "SstPartitionerFixedPrefixFactory"; }
   const char* Name() const override { return kClassName(); }
